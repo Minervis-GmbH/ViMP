@@ -90,6 +90,7 @@ abstract class xvmpGUI {
         $buttons = [];
         if (!is_null($this->getObject())) {
             $buttons[] = $this->buildPermLinkUI($medium);
+			$buttons[] = $this->buildCopiableVideoLinkUI($medium);
         }
 
         if ($medium->isDownloadAllowed()) {
@@ -147,6 +148,37 @@ abstract class xvmpGUI {
             $this->dic->ui()->factory()->legacy('</span></div>'),
         ];
     }
+
+	/**
+     * @param xvmpMedium $video
+     * @return ILIAS\UI\Component\Component[]
+     */
+	public function buildCopiableVideoLinkUI($video)
+	{
+		$medium = $video->getMedium();
+		$this->dic->logger()->root()->dump($medium);
+		if (is_array($medium)){
+			$medium = $medium[0];
+		}
+		$video_link = $video->getSource();
+		$html = '';
+		if(true || ilObjViMPAccess::hasAccessToLink()){
+			//$link_info = '<div class ="link-info"><p>'. $this->pl->txt("perm_readlink"). '</p></div>';
+			$html = '<div class="ilPermalinkContainer input-group">'.
+					'<input class="form-control" readonly="readonly" id="videoUrl" type="text"'.
+					'value="' .$medium .'"'.
+					' onclick="return false;">'.
+					'<span class="input-group-btn">	<div class="btn-group"><button type="button" class="btn btn-default" id="copyVideoUrl">'.
+					'<span class="sr-only">Copy to clipboard</span><span class="glyphicon glyphicon-copy"></span></button></div></span></div>';
+			
+			$copy_js = "<script> $('#copyVideoUrl',document).on('click',function(e){let copyText=$('#videoUrl',document).get(0);copyText.select();copyText.setSelectionRange(0,99999);document.execCommand('copy')});</script>";
+			$html = $html . $copy_js;
+			return [
+				$this->dic->ui()->factory()->legacy($html),
+			];
+		}
+		return [];
+	}
 
     /**
 	 *
