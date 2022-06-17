@@ -156,25 +156,25 @@ abstract class xvmpGUI {
 	public function buildCopiableVideoLinkUI($video)
 	{
 		$medium = $video->getMedium();
-		$this->dic->logger()->root()->dump($medium);
 		if (is_array($medium)){
 			$medium = $medium[0];
 		}
-		$video_link = $video->getSource();
-		$html = '';
+		$link_container = '';
 		if(true || ilObjViMPAccess::hasAccessToLink()){
-			//$link_info = '<div class ="link-info"><p>'. $this->pl->txt("perm_readlink"). '</p></div>';
-			$html = '<div class="ilPermalinkContainer input-group">'.
-					'<input class="form-control" readonly="readonly" id="videoUrl" type="text"'.
+			$link_container = '<div class="ilPermalinkContainer input-group" id ="link_container">'.
+					'<input class="form-control" readonly="readonly" id="video_url" type="text"'.
 					'value="' .$medium .'"'.
 					' onclick="return false;">'.
-					'<span class="input-group-btn">	<div class="btn-group"><button type="button" class="btn btn-default" id="copyVideoUrl">'.
+					'<span class="input-group-btn">	<div class="btn-group"><button type="button" class="btn btn-default" id="copy_video_url">'.
 					'<span class="sr-only">Copy to clipboard</span><span class="glyphicon glyphicon-copy"></span></button></div></span></div>';
 			
-			$copy_js = "<script> $('#copyVideoUrl',document).on('click',function(e){let copyText=$('#videoUrl',document).get(0);copyText.select();copyText.setSelectionRange(0,99999);document.execCommand('copy')});</script>";
-			$html = $html . $copy_js;
+			$copy_js = "<script> $('#copy_video_url',document).on('click',function()  { $('#video_url',document).select(); VimpContent.copyToClipboard('{$medium}');} );</script>";
 			return [
-				$this->dic->ui()->factory()->legacy($html),
+				$this->dic->ui()->factory()->legacy(
+					'<div class ="link-info"><p>'. $this->pl->txt("perm_readlink"). '</p></div>'
+				),
+				$this->dic->ui()->factory()->legacy($link_container), 
+				$this->dic->ui()->factory()->legacy($copy_js)
 			];
 		}
 		return [];
